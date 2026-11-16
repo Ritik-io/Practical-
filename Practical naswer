@@ -1,0 +1,157 @@
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <cctype>
+#include <stdexcept>
+using namespace std;
+
+// Abstract base class
+class WordDemo {
+private:
+    string str;                         // private data member
+
+protected:
+    string getStr() const {             // lets derived class read the private string
+        return str;
+    }
+
+public:
+    WordDemo(string s) {                // parameterized constructor
+        str = s;
+    }
+
+    virtual void countVowelWords() = 0; // pure virtual function
+
+    virtual ~WordDemo() {}
+};
+
+// Derived class
+class StringDemo : public WordDemo {
+public:
+    StringDemo(string s) : WordDemo(s) {}   // pass string to base constructor
+
+    void countVowelWords() override {
+        stringstream ss(getStr());
+        string word;
+        int count = 0;
+
+        while (ss >> word) {
+            char ch = tolower(word[0]);
+            if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+                count++;
+            }
+        }
+
+        if (count > 4) {
+            throw runtime_error("More than 4 words start with a vowel!");
+        }
+
+        cout << "Frequency of words starting with a vowel: " << count << endl;
+    }
+};
+
+int main() {
+    string s;
+    cout << "Enter a sentence: ";
+    getline(cin, s);
+
+    WordDemo *ptr = new StringDemo(s);   // base pointer -> derived object
+
+    try {
+        ptr->countVowelWords();          // runtime polymorphism
+    }
+    catch (runtime_error &e) {
+        cout << "Error: " << e.what() << endl;
+    }
+
+    delete ptr;
+    return 0;
+}
+
+
+question 2
+
+
+
+#include <iostream>
+#include <fstream>
+#include <stdexcept>
+using namespace std;
+
+int main()
+{
+    int a[4], b[4], c[8];
+
+    ifstream fin("data.txt");
+
+    if (!fin)
+    {
+        cout << "File cannot be opened";
+        return 1;
+    }
+
+    int temp, i = 0;
+
+    // Read numbers using one while loop
+    while (fin >> temp)
+    {
+        if (i < 4)
+            a[i] = temp;
+        else if (i < 8)
+            b[i - 4] = temp;
+
+        i++;
+    }
+
+    fin.close();
+
+    if (i < 8)
+    {
+        cout << "Insufficient data";
+        return 1;
+    }
+
+    // Merge arrays
+    int k = 0;
+    i = 0;
+
+    while (i < 4)
+    {
+        c[k++] = a[i];
+        c[k++] = b[3 - i];
+        i++;
+    }
+
+    try
+    {
+        int count = 0;
+        i = 0;
+
+        while (i < 8)
+        {
+            if (c[i] % 2 == 0)
+                count++;
+
+            i++;
+        }
+
+        if (count > 5)
+            throw runtime_error("Even count is greater than 5!");
+
+        cout << "C array: ";
+
+        i = 0;
+        while (i < 8)
+        {
+            cout << c[i] << " ";
+            i++;
+        }
+    }
+    catch (runtime_error &e)
+    {
+        cout << "Error: " << e.what();
+    }
+
+    return 0;
+}
+
